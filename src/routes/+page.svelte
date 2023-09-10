@@ -18,7 +18,7 @@
 
     loadData();
 
-    let question = "Hi I'm Thomas, I might be having a health problem, \n will you help me?"
+    let question = ""
     let questionIndex = 0;
 
 
@@ -27,11 +27,12 @@
 
 
         if (questionIndex === 0) { // if zero then init the question
-            question = `When I experience ${processed[questionIndex].condition} ${processed[questionIndex].symptom}, do I have "${processed[questionIndex].condition} ${processed[questionIndex].amHaveLook}"?`
+            question = `am I ${processed[questionIndex].condition} ${processed[questionIndex].symptom}, "${processed[questionIndex].condition} ${processed[questionIndex].amHaveLook}"?`
             questionIndex++
         } else if (questionIndex > 0) {
             // set the question to instructions
-            question = `cond: ${processed[questionIndex].condition} user instructions: ${processed[questionIndex - 1].instructions}, user contacts: ${processed[questionIndex - 1].contacts}`
+            question = `I'm experiencing symptoms of my ${processed[questionIndex - 1].condition}`
+            //  user instructions: ${processed[questionIndex - 1].instructions}, user contacts: ${processed[questionIndex - 1].contacts}
             finished = true;
         }
 
@@ -41,10 +42,14 @@
         console.log(questionIndex, "no");
 
         if (questionIndex > 0 && questionIndex < processed.length) { // if >0 then update the question
-            question = `When I experience ${processed[questionIndex].condition} ${processed[questionIndex].symptom}, do I have "${processed[questionIndex].condition} ${processed[questionIndex].amHaveLook}"?`
+            question = `am I ${processed[questionIndex].condition} ${processed[questionIndex].symptom}, "${processed[questionIndex].condition} ${processed[questionIndex].amHaveLook}"?`
             questionIndex++
         } else if (questionIndex == 0) {
             question = "please call 911"
+            questionIndex = 23289; // I'll change this later
+        } else if (questionIndex = processed.length) {
+            question = "I'm having an unusual emergency, please call 911 and tell them I have " + processed[questionIndex - 1].condition
+            questionIndex = 23289; // I'll change this later
         }
 
         
@@ -53,16 +58,23 @@
 </script>
 
 <main>
-    <!-- <div class="question">Hi, I'm Thomas.</div>
-    <div class="question">I might be having a health problem.</div>
-    <div id="test" class="question">Will you help me?</div> -->
+    <!-- if question index is zero, show the first 3 lines -->
+    {#if questionIndex === 0}
+        <div class="question">Hi, I'm Thomas.</div>
+        <div class="question">I might be having a health problem.</div>
+        <div id="test" class="question">Will you help me?</div>
+    {/if}
     <div class="question">{question}</div>
     
     {#if finished}
-    <button on:click={yesHandler}>Tap here to call {processed[questionIndex - 1].contacts}</button>
-    {:else }
+    <div class="instructions question">Instructions: {processed[questionIndex - 1].instructions}</div>
+    <button id="contact-button" on:click={yesHandler}>Please click here to call {processed[questionIndex - 1].contacts}</button>
+    {:else if questionIndex < 100 }
         <button on:click={yesHandler}>Yes</button>
         <button id="no" on:click={noHandler}>No</button>
+    {:else if questionIndex > 100 }
+    <button>Tap here to call 911</button>
+
     {/if}
 </main>    
 
