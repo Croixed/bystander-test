@@ -2,36 +2,52 @@
     import { supabase } from "$lib/supabaseClient";
     import { page } from "$app/stores";
     export let data;
+    console.log(data, "dataaa")
 
     const url = $page.url;
     console.log(url.searchParams.get('id'), "url test");
     const urlId = url.searchParams.get('id');
 
     let processed;
+    let name;
     let finished = false;
 
     async function loadData() {
         const { data } = await supabase.from("trees").select('*').eq("id", urlId);
+        // id = data[0].id;
+        console.log(data[0].user_uid, "data2");
         processed = JSON.parse(data[0].tree);
         console.log(processed, "processed");
+
+        const { data: userData } = await supabase.from("info").select('*').eq("id", data[0].user_uid);
+        console.log(userData[0].fname, "userData");
+        name = userData[0].fname;
     }
 
     loadData();
 
     let question = ""
     let questionIndex = 0;
-
+    let contactClass = false;
 
     let yesHandler = () => {
         console.log(questionIndex, "yes");
 
-
         if (questionIndex === 0) { // if zero then init the question
-            question = `am I ${processed[questionIndex].condition} ${processed[questionIndex].symptom}, "${processed[questionIndex].condition} ${processed[questionIndex].amHaveLook}"?`
+            if (processed[questionIndex].amHaveLookType === "am") {
+                question = `am I ${processed[questionIndex].amHaveLook}?`
+            } else if (processed[questionIndex].amHaveLookType === "have") {
+                question = `Do I have ${processed[questionIndex].amHaveLook}?`
+            } else if (processed[questionIndex].amHaveLookType === "look") {
+                question = `do I look ${processed[questionIndex].amHaveLook}?`
+            }
+            // question = `am I ${processed[questionIndex].amHaveLook}?`
+            console.log(processed[questionIndex], "question");
             questionIndex++
         } else if (questionIndex > 0) {
             // set the question to instructions
             question = `I'm experiencing symptoms of my ${processed[questionIndex - 1].condition}`
+            contactClass = true;
             //  user instructions: ${processed[questionIndex - 1].instructions}, user contacts: ${processed[questionIndex - 1].contacts}
             finished = true;
         }
@@ -42,13 +58,22 @@
         console.log(questionIndex, "no");
 
         if (questionIndex > 0 && questionIndex < processed.length) { // if >0 then update the question
-            question = `am I ${processed[questionIndex].condition} ${processed[questionIndex].symptom}, "${processed[questionIndex].condition} ${processed[questionIndex].amHaveLook}"?`
+            // this can definitely be refactored since I'm copy pasting lots of code, will clean up later
+            if (processed[questionIndex].amHaveLookType === "am") {
+                question = `am I ${processed[questionIndex].amHaveLook}?`
+            } else if (processed[questionIndex].amHaveLookType === "have") {
+                question = `Do I have ${processed[questionIndex].amHaveLook}?`
+            } else if (processed[questionIndex].amHaveLookType === "look") {
+                question = `do I look ${processed[questionIndex].amHaveLook}?`
+            }
             questionIndex++
         } else if (questionIndex == 0) {
             question = "please call 911"
+            contactClass = true;
             questionIndex = 23289; // I'll change this later
         } else if (questionIndex = processed.length) {
             question = "I'm having an unusual emergency, please call 911 and tell them I have " + processed[questionIndex - 1].condition
+            contactClass = true; // could probably use finished instead?
             questionIndex = 23289; // I'll change this later
         }
 
@@ -60,7 +85,7 @@
 <main>
     <!-- if question index is zero, show the first 3 lines -->
     {#if questionIndex === 0}
-        <div class="question">Hi, I'm Thomas.</div>
+        <div class="question">Hi, I'm {name}</div>
         <div class="question">I might be having a health problem.</div>
         <div id="test" class="question">Will you help me?</div>
     {/if}
@@ -68,12 +93,12 @@
     
     {#if finished}
     <div class="instructions question">Instructions: {processed[questionIndex - 1].instructions}</div>
-    <button id="contact-button" on:click={yesHandler}>Please click here to call {processed[questionIndex - 1].contacts}</button>
+    <button class="contact"  on:click={yesHandler}>Please click here to call {processed[questionIndex - 1].contacts}</button>
     {:else if questionIndex < 100 }
         <button on:click={yesHandler}>Yes</button>
         <button id="no" on:click={noHandler}>No</button>
     {:else if questionIndex > 100 }
-    <button>Tap here to call 911</button>
+    <button class="contact">Tap here to call 911</button>
 
     {/if}
 </main>    
@@ -131,5 +156,10 @@
 
     #test {
         font-weight: 700;
+    }
+
+    .contact {
+        background-color: yellow;
+        color: black;
     }
 </style>
