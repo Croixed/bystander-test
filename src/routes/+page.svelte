@@ -35,13 +35,13 @@
 
         if (questionIndex === 0) { // if zero then init the question
             if (processed[questionIndex].amHaveLookType === "am") {
-                question = `am I ${processed[questionIndex].amHaveLook}?`
+                question = `Am I ${processed[questionIndex].amHaveLook}?`
             } else if (processed[questionIndex].amHaveLookType === "have") {
                 question = `Do I have ${processed[questionIndex].amHaveLook}?`
             } else if (processed[questionIndex].amHaveLookType === "look") {
-                question = `do I look ${processed[questionIndex].amHaveLook}?`
+                question = `Do I look ${processed[questionIndex].amHaveLook}?`
             }
-            // question = `am I ${processed[questionIndex].amHaveLook}?`
+            // question = `Am I ${processed[questionIndex].amHaveLook}?`
             console.log(processed[questionIndex], "question");
             questionIndex++
         } else if (questionIndex > 0) {
@@ -93,7 +93,12 @@
     
     {#if finished}
     <div class="instructions question">Instructions: {processed[questionIndex - 1].instructions}</div>
-    <button class="contact"  on:click={yesHandler}>Please click here to call {processed[questionIndex - 1].contacts}</button>
+    <a class="contact"  on:click={yesHandler} href="tel:{processed[questionIndex - 1].phone}">
+        <button class="contact">
+            Please click here to call {processed[questionIndex - 1].contacts}
+        </button>
+    </a>
+
     {:else if questionIndex < 100 }
         <button on:click={yesHandler}>Yes</button>
         <button id="no" on:click={noHandler}>No</button>
