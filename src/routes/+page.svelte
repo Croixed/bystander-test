@@ -93,11 +93,15 @@
     
     {#if finished}
     <div class="instructions question">Instructions: {processed[questionIndex - 1].instructions}</div>
-    <a class="contact"  on:click={yesHandler} href="tel:{processed[questionIndex - 1].phone}">
-        <button class="contact">
-            Please click here to call {processed[questionIndex - 1].contacts}
-        </button>
-    </a>
+
+
+    {#if processed[questionIndex - 1].severity !== "mild"}
+        <a class="contact"  on:click={yesHandler} href="tel:{processed[questionIndex - 1].phone}">
+            <button class="contact">
+                Please click here to call {processed[questionIndex - 1].contacts}
+            </button>
+        </a>
+    {/if}
 
     {:else if questionIndex < 100 }
         <button on:click={yesHandler}>Yes</button>
