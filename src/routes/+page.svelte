@@ -103,7 +103,10 @@
         <button on:click={yesHandler}>Yes</button>
         <button id="no" on:click={noHandler}>No</button>
     {:else if questionIndex > 100 }
-    <button class="contact">Tap here to call 911</button>
+
+    <a class="contact" href="tel:911">
+      <button class="contact">Tap here to call 911</button>
+    </a>
 
     {/if}
 </main>    
@@ -146,9 +149,9 @@
     }
 
     button {
+        background-color: #289642;
         border: none;
         border-radius: 12px;
-        background-color: #289642;
         padding: 12px;
         font-size: 24px;
         margin: 0 16px;
@@ -166,5 +169,9 @@
     .contact {
         background-color: yellow;
         color: black;
+        border: none;
+        border-radius: 12px;
+        font-size: 24px;
+        margin: 0 16px;
     }
 </style>
